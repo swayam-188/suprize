@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Hii cutie — This is for you</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#ff6b9a; --accent-2:#ffb3d1; --text:#fff; --muted:rgba(255,255,255,0.75);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: "Poppins", system-ui, -apple-system;
+    color:var(--text);
+    height:100%;
+    overflow:hidden;
+    background: linear-gradient(180deg,#111 0%, #000 100%);
+  }
+
+  /* background video */
+  .bg-video{ position:fixed; inset:0; z-index:0; width:100%; height:100%; overflow:hidden; background:linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.5)); }
+  .bg-video video{
+    min-width:100%; min-height:100%; width:auto; height:100%; object-fit:cover;
+    /* initial blurred/dim look */
+    filter: blur(10px) brightness(0.4) saturate(1.1);
+    transform: scale(1.05);
+    transition: filter 1.2s ease, opacity 1.2s ease;
+    opacity: 1;
+  }
+  .bg-overlay{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.55)); pointer-events:none; }
+
+  /* layout */
+  .stage{ position:relative; z-index:5; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px; }
+  .card{ width: min(720px,94%); max-width:720px; border-radius:18px; background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.06); padding:30px; display:flex; gap:24px; align-items:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); backdrop-filter: blur(8px); }
+
+  .left{ flex:1; min-width:200px; }
+  .title{ font-family: "Great Vibes", cursive; font-size: clamp(28px,5.5vw,48px); color:var(--accent); margin-bottom:8px; text-shadow: 0 6px 30px rgba(255,107,154,0.12); }
+  .subtitle{ font-weight:600; color:var(--muted); font-size:clamp(12px,2.5vw,16px); margin-bottom:18px; }
+  .note{ font-size:14px; color:rgba(255,255,255,0.9); }
+
+  .surprise-col{ width:320px; display:flex; flex-direction:column; align-items:center; }
+  .box { width:220px; height:220px; border-radius:16px; background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:center; flex-direction:column; position:relative; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.45); transition: transform 300ms cubic-bezier(.2,.9,.3,1), box-shadow 300ms; cursor:pointer; -webkit-tap-highlight-color:transparent; user-select:none; }
+  .box .lid { width:100%; height:46%; background: linear-gradient(180deg,var(--accent),var(--accent-2)); position:absolute; top:0; left:0; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; }
+  .box.open .lid { transform: translateY(-56%) rotateX(8deg) scale(1.02); box-shadow:0 18px 60px rgba(255,107,154,0.12); }
+  .pulse{ position:absolute; inset:-40%; z-index:1; opacity:0.08; filter: blur(18px); background: radial-gradient(circle, rgba(255,107,154,0.35), transparent 30%); transition: opacity 400ms; }
+  .box.open .pulse { opacity:0.35 }
+
+  .surprise-label{ margin-top:18px; font-weight:700; color:var(--muted); font-size:14px; text-transform:uppercase; letter-spacing:1px; }
+  .watermark{ position:fixed; z-index:40; right:12px; bottom:8px; font-size:12px; color:rgba(255,255,255,0.5); padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); pointer-events:none; text-align:right; }
+
+  .effects{ position:fixed; inset:0; pointer-events:none; z-index:30; }
+
+  @media (max-width:720px){ .card{ flex-direction:column; align-items:center; padding:20px; gap:14px } .box{ width:68vw; height:68vw; max-width:300px; max-height:300px } }
+
+  /* falling */
+  @keyframes fallGeneric { from { transform: translateY(-40vh) rotate(0deg); opacity:1 } to { transform: translateY(120vh) rotate(360deg); opacity:0.95 } }
+
+  /* typewriter */
+  @keyframes typewriter { from { width: 0 } to { width: 100% } }
+  @keyframes blinkCursor { 50% { border-color: transparent } }
+
+  /* small helpful styles for play-again button */
+  .play-again {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:99999;
+    padding:14px 26px; font-size:18px; color:#fff; background:rgba(0,0,0,0.5); border-radius:12px; border:1px solid rgba(255,255,255,0.16);
+    cursor:pointer; backdrop-filter: blur(6px); box-shadow:0 8px 30px rgba(0,0,0,0.45);
+  }
+
+
+  .rotate-warning {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  background: rgba(0,0,0,0.5);
+  padding: 12px 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  z-index: 999999;
+  text-align: center;
+  display: none;
+}
+
+</style>
+
+
+</head>
+<body>
+
+  <!-- VIDEO BACKGROUND -->
+  <div class="bg-video" aria-hidden="true">
+    <video id="bgVid" playsinline webkit-playsinline muted preload="auto" playsinline>
+      <source src="vid.mp4" type="video/mp4">
+      <!-- fallback image could be inserted here -->
+    </video>
+    <div class="bg-overlay" aria-hidden="true"></div>
+  </div>
+
+  <main class="stage" role="main">
+    <div class="card" role="region" aria-label="Surprise card">
+      <div class="left">
+        <div class="title">Hii cutie .. this is for you</div>
+        <div class="subtitle">A tiny surprise — click the box and enjoy 💖</div>
+        <div class="note">Tap gently on your phone. Music & falling love will start.</div>
+      </div>
+
+      <div class="surprise-col" aria-hidden="false">
+        <div id="surpriseBox" class="box" role="button" tabindex="0" aria-pressed="false" aria-label="Open surprise box">
+          <div class="lid">Open me ✨</div>
+          <div class="pulse" aria-hidden="true"></div>
+          <div class="gift" aria-hidden="false">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 9h18v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9z" stroke="white" stroke-opacity="0.95" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 9V3" stroke="white" stroke-opacity="0.95" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 3c-1 0-2 1-3 2-1 1-2 1-2 2" stroke="white" stroke-opacity="0.95" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 3c1 0 2 1 3 2 1 1 2 1 2 2" stroke="white" stroke-opacity="0.95" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div style="margin-top:10px; font-weight:700; color:white;">Surprise</div>
+          </div>
+        </div>
+
+        <div class="surprise-label">Tap the box</div>
+        <div class="small">(Video sound will start after you tap the box on mobile)</div>
+      </div>
+    </div>
+  </main>
+
+  <div class="watermark" aria-hidden="true">made by <strong>swayam</strong> — with love for you!!<br><small style="opacity:.9">you are my fav person</small></div>
+
+  <div id="effects" class="effects" aria-hidden="true"></div>
+  <div id="rotateMsg" class="rotate-warning">
+  Rotate your device for the best experience 😊
+</div>
+
+
+  
+
+<script>
+/* -------------------------
+   CONFIG (easy to tweak)
+   ------------------------- */
+const USS_WHEN_DURATION_MS = 3000;   // how long "uss when😭" stays visible
+const VIDEO_FADE_START_MS = 42000;   // when to start fade-out (ms) - set to 42000 for 42s
+const VIDEO_FADE_DURATION_MS = 3000; // duration of fade-out (ms)
+
+/* -------------------------
+   DOM refs
+   ------------------------- */
+const box = document.getElementById('surpriseBox');
+const lid = box.querySelector('.lid');
+const effects = document.getElementById('effects');
+const bgVid = document.getElementById('bgVid');
+let opened = false;
+
+/* -------------------------
+   spawnFalling: hearts/snow etc
+   ------------------------- */
+
+function checkOrientation() {
+  const rotateMsg = document.getElementById("rotateMsg");
+
+  // portrait mode detection
+  if (window.innerHeight > window.innerWidth) {
+    rotateMsg.style.display = "block";
+  } else {
+    rotateMsg.style.display = "none";
+  }
+}
+
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", checkOrientation);
+
+// check on first load
+checkOrientation();
+
+function spawnFalling(char, count, sizeRange, speedRange, blur=false){
+  for (let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.style.position = 'fixed';
+    el.style.left = (Math.random()*100) + 'vw';
+    el.style.top = (-10 - Math.random()*20) + 'vh';
+    el.style.fontSize = Math.floor(sizeRange[0] + Math.random()*(sizeRange[1]-sizeRange[0])) + 'px';
+    el.style.zIndex = 50;
+    el.style.pointerEvents = 'none';
+    el.style.willChange = 'transform, opacity';
+    el.textContent = char;
+    const dur = (speedRange[0] + Math.random()*(speedRange[1]-speedRange[0])).toFixed(2);
+    el.style.animation = `fallGeneric ${dur}s linear forwards`;
+    if (blur) el.style.filter = 'blur(1px)';
+    effects.appendChild(el);
+    setTimeout(()=> el.remove(), (speedRange[1]+1)*1000 + 300);
+  }
+}
+
+/* -------------------------
+   showTypewriterMessage: "uss when😭"
+   ------------------------- */
+function showTypewriterMessage(text, topPct = '47%'){
+  // ensure only one exists
+  if (document.getElementById('ussWhenText')) return;
+  const uw = document.createElement('div');
+  uw.id = 'ussWhen';
+  uw.innerText = text;
+  uw.style.position = 'fixed';
+  uw.style.top = topPct;
+  uw.style.left = '50%';
+  uw.style.transform = 'translateX(-0%)';
+  uw.style.fontSize = '36px';
+  uw.style.fontWeight = '700';
+  uw.style.color = 'rgba(255,255,255,0.96)';
+  uw.style.textShadow = '0 0 14px rgba(255,255,255,0.35)';
+  uw.style.zIndex = '9999';
+
+  // typewriter visual
+  uw.style.whiteSpace = 'nowrap';
+  uw.style.overflow = 'hidden';
+  uw.style.borderRight = '3px solid rgba(255,255,255,0.9)';
+  uw.style.width = '0';
+  uw.style.background = 'transparent';
+
+  // use CSS animation via JS
+  uw.style.animation = `typewriter ${Math.max(1200, USS_WHEN_DURATION_MS - 400)}ms steps(${Math.max(10, text.length)}, end) 0s forwards, blinkCursor 0.9s step-end infinite`;
+
+  document.body.appendChild(uw);
+
+  // remove after configured time
+  setTimeout(()=>{
+    uw.style.transition = 'opacity 0.9s ease';
+    uw.style.opacity = '0';
+    setTimeout(()=> { uw.remove(); }, 1000);
+  }, USS_WHEN_DURATION_MS);
+}
+
+/* -------------------------
+   openBox: main flow
+   ------------------------- */
+function openBox(){
+  if (opened) return;
+  opened = true;
+  box.classList.add('open');
+  lid.innerText = 'Surprise!';
+
+  // spawn falling items
+  spawnFalling('❄️', 40, [12,22], [3.2,5.4], true);
+  spawnFalling('💖', 65, [18,34], [2.6,4.8]);
+  spawnFalling('✨', 28, [12,20], [2.2,3.8]);
+  setTimeout(()=> spawnFalling('❤️', 40, [20,44], [1.8,3.2]), 500);
+
+  // show "uss when😭" with typewriter (short)
+  
+
+  // fade the card out nicely
+  const card = document.querySelector('.card');
+  card.style.transition = 'opacity 1.1s ease';
+  setTimeout(()=> { card.style.opacity = '0'; }, 350);
+  setTimeout(()=> { card.style.display = 'none'; }, 1400);
+
+  // PLAY & UNMUTE the video — inside user gesture (click/tap)
+  // small delay helps mobile browsers accept the gesture
+  setTimeout(() => {
+    // try to start playback first, then unmute
+    bgVid.currentTime = 0;
+    bgVid.play().then(() => {
+      // unmute after play promise resolved (most browsers allow)
+      try { bgVid.muted = false; } catch(e){}
+      // remove blur to reveal video
+      bgVid.style.filter = 'blur(0px) brightness(1) saturate(1.08)';
+    }).catch(()=> {
+      // fallback: set muted=false and attempt play again
+      try { bgVid.muted = false; } catch(e){}
+      bgVid.play().catch(()=>{ /* ignore */ });
+      bgVid.style.filter = 'blur(0px) brightness(1) saturate(1.08)';
+    });
+  }, 120);
+
+  // SCHEDULE: fade out & stop at configured time (to avoid watermark)
+  const fadeOutDelay = VIDEO_FADE_START_MS;
+  setTimeout(()=>{
+    bgVid.style.transition = `opacity ${VIDEO_FADE_DURATION_MS}ms ease`;
+    bgVid.style.opacity = '0';
+  }, fadeOutDelay);
+
+  setTimeout(()=>{
+    // pause & make sure video is visually hidden
+    try { bgVid.pause(); } catch(e){}
+    bgVid.style.opacity = '0';
+    // show Play Again button
+    showPlayAgainButton();
+  }, fadeOutDelay + VIDEO_FADE_DURATION_MS + 120);
+}
+
+/* -------------------------
+   Play Again button
+   ------------------------- */
+function showPlayAgainButton(){
+  // ensure single
+  if (document.getElementById('playAgainBtn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'playAgainBtn';
+  btn.className = 'play-again';
+  btn.innerText = '▶ Play Again';
+  document.body.appendChild(btn);
+  btn.style.opacity = '0';
+  setTimeout(()=> btn.style.opacity = '1', 80);
+
+  btn.addEventListener('click', ()=>{
+    // remove button
+    btn.remove();
+    // reset video visuals & play
+    bgVid.style.opacity = '1';
+    bgVid.style.filter = 'blur(0px) brightness(1) saturate(1.08)';
+    bgVid.currentTime = 0;
+    bgVid.play().catch(()=>{});
+  }, { once:true });
+}
+
+/* -------------------------
+   events
+   ------------------------- */
+box.addEventListener('click', openBox);
+box.addEventListener('touchstart', (e)=>{ e.preventDefault(); openBox(); }, {passive:false});
+box.addEventListener('keydown', (e)=> { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBox(); }});
+
+/* mobile unlock helper: first interaction ensures playback allowed */
+let unlocked = false;
+function unlockMedia(){
+  if (unlocked) return;
+  unlocked = true;
+  // immediate attempt to play muted video (most browsers allow muted autoplay)
+  bgVid.play().catch(()=>{});
+  // do not unmute here — unmute only on explicit openBox click
+  window.removeEventListener('touchstart', unlockMedia);
+  window.removeEventListener('click', unlockMedia);
+}
+window.addEventListener('touchstart', unlockMedia, {passive:true});
+window.addEventListener('click', unlockMedia);
+
+/* tiny idle float for the card before open */
+(function cardFloat(){
+  const card = document.querySelector('.card');
+  let t = 0;
+  function frame(){
+    if (!opened) { t += 0.006; card.style.transform = `translateY(${Math.sin(t)*6}px)`; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
